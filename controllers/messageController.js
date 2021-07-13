@@ -1,4 +1,4 @@
-const {Message} = require(`models/tmp`);
+const {Message} = require(`../models`);
 
 
 

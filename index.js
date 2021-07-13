@@ -3,25 +3,27 @@ const app = express();
 const WebSocket = require('ws');
 const wsServer = new WebSocket.Server({ port: 8080 });
 require('dotenv').config();
-const {Message, User} = require(`models/tmp`);
-const {authController} = require('./controllers')
+const {Message, User} = require(`./models`);
+const {authController} = require('./controllers');
 
-console.log(authController)
+//console.log(authController)
 
-require(`./connectors`).sync();
+//require(`./connectors`).sync();
 
 
 
 ///////////////////////////////////////////////
 
 (async ()=>{
-   // await authController.registration({User: {login: `vasia`, password: `qwerty321`, color: `RED`}});
+  //  console.log(User.prototype)
+    await authController.registration({User: {login: `vasia`, password: `qwerty321`, color: `RED`}});
 
-    const user = await User.findOne({where: {login: `vasia`}});
-
-    if(!user) return
-
-    await user.createMessage({text: 'Hello its work!!!'})
+     const user = await User.findOne({where: {login: `vasia`}});
+     console.log(user)
+    //
+     if(!user) return
+    //
+     await user.createMessage({text: 'Hello its work!!!'})
 
 })();
 

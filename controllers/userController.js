@@ -1,4 +1,4 @@
-const {User} = require(`models/tmp`);
+const {User} = require(`../models`);
 const {verify} = require(`jsonwebtoken`);
 
 
