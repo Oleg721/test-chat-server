@@ -1,98 +1,50 @@
 const express = require('express');
+const bodyParser = require('body-parser')
 const app = express();
 const WebSocket = require('ws');
-const wsServer = new WebSocket.Server({ port: 8080 });
+const onConnect = require(`./webSocket`);
 require('dotenv').config();
+const wsServer = new WebSocket.Server({ port: process.env.DEV_WS_PORT });
+
 const {Message, User} = require(`./models`);
 const {authController} = require('./controllers');
 
-//console.log(authController)
+app.use(express.static('public'));
 
-//require(`./connectors`).sync();
+app.use(bodyParser.json());
 
+app.get('/', (req, res) => {
+    res.send('Hello World!')
+});
 
+app.post('/authorization', (req, res) => {
+    console.log(req.headers);
+    console.log(req.body);
+    res.send(JSON.stringify({data: `its Work!!!`}));
+});
 
 
 ///////////////////////////////////////////////
 
 (async ()=>{
   //  console.log(User.prototype)
-    await authController.registration({User: {login: `vasia`, password: `qwerty321`, color: `RED`}});
-
-     const user = await User.findOne({where: {login: `vasia`}});
-     console.log(user)
-    //
-     if(!user) return
-    //
-     await user.createMessage({text: 'Hello its work!!!'})
+  //   await authController.registration({User: {login: `vasia`, password: `qwerty321`, color: `RED`}});
+  //
+  //    const user = await User.findOne({where: {login: `vasia`}});
+  //    console.log(user)
+  //   //
+  //    if(!user) return
+  //   //
+  //    await user.createMessage({text: 'Hello its work!!!'})
 
 })();
 
 
-
+app.listen(port = process.env.DEW_PORT, () => {
+    console.log(`Example app listening at http://localhost:${port}`)
+})
 
 
 //////////////////////////////////////////////////
 wsServer.on('connection', onConnect);
-
-function onConnect(wsClient) {
-    console.log('new connect');
-    wsClient.send('hello!');
-
-    wsClient.on('close', function() {
-        console.log('user disconnect');
-    });
-
-
-
-
-
-    wsClient.on('message', function(message) {
-        console.log(message);
-        try {
-            const jsonMessage = JSON.parse(message);
-            switch (jsonMessage.action) {
-                case 'ECHO':
-
-                    wsServer.clients.forEach(value => value.send(jsonMessage.data))
-                    //wsClient.send(jsonMessage.data);
-
-                    break;
-                // case 'PING':
-                //     setTimeout(function() {
-                //         wsClient.send('PONG');
-                //     }, 2000);
-                //     break;
-                default:
-                    console.log('Неизвестная команда');
-                    break;
-            }
-        } catch (error) {
-            console.log('Ошибка', error);
-        }
-    });
-
-    // wsClient.on('message', function(message) {
-    //     console.log(message);
-    //     try {
-    //         const jsonMessage = JSON.parse(message);
-    //         switch (jsonMessage.action) {
-    //             case 'ECHO':
-    //                 wsClient.send(jsonMessage.data);
-    //                 break;
-    //             case 'PING':
-    //                 setTimeout(function() {
-    //                     wsClient.send('PONG');
-    //                 }, 2000);
-    //                 break;
-    //             default:
-    //                 console.log('Неизвестная команда');
-    //                 break;
-    //         }
-    //     } catch (error) {
-    //         console.log('Ошибка', error);
-    //     }
-    // });
-}
-
 console.log('Сервер запущен на 8080 порту');

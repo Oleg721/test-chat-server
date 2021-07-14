@@ -14,7 +14,7 @@ module.exports = {
         unique : true,
         validate: {
           min: 3,
-          not: /\S/i
+          is: /\w/
         }
       },
       passwordHash: {

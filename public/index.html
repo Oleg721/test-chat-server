@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<input id="inputField" type="text">
+<button id="sendBTN">send</button>
+
+<input id="login" type="text">
+<input id="password" type="text">
+<button id="reg">SignIn</button>
+<script>
+    let getSend = url => (data) => fetch(url, {
+        method: 'POST',
+        headers: {
+            accept: 'application/json',
+            'content-type': 'application/json',
+            ...(localStorage.authToken ? {Authorization: 'Bearer ' + localStorage.authToken} : {})
+        },
+        body: JSON.stringify(data)
+    }).then(res => res.json())
+        .then(result => {
+
+            if ('errors' in result) throw new Error(JSON.stringify(result.errors))
+            return Object.values(result.data)
+        })
+
+    reg.addEventListener('click', ()=>{
+        getSend(`http://localhost:3000/authorization`)({mes:`hello!`})
+    })
+
+
+
+    // const myWs = new WebSocket('ws://localhost:8080');
+    // // обработчик проинформирует в консоль когда соединение установится
+    // myWs.onopen = function () {
+    //     console.log('подключился');
+    // };
+    // // обработчик сообщений от сервера
+    // myWs.onmessage = function (message) {
+    //     console.log('Message: %s', message.data);
+    // };
+    // // функция для отправки echo-сообщений на сервер
+    // function wsSendEcho(value) {
+    //     myWs.send(JSON.stringify({action: 'ECHO', data: value.toString()}));
+    // }
+    // // функция для отправки команды ping на сервер
+    // function wsSendPing() {
+    //     myWs.send(JSON.stringify({action: 'PING'}));
+    // }
+    //
+    // sendBTN.addEventListener('click', ()=>{
+    //
+    //     wsSendEcho(inputField.value)
+    // })
+
+</script>
+</body>
+</html>
