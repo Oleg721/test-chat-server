@@ -1,3 +1,6 @@
+const Ajv = require("ajv");
+const userJsonSchema = require('../jsonShemas')
+
 
 
 module.exports.isPasswordValid = (password)=>{
@@ -6,8 +9,14 @@ module.exports.isPasswordValid = (password)=>{
 }
 
 
-module.exports.isUserValid = ({login})=>{
+module.exports.isUserValid = (user)=>{
+    const ajv = new Ajv()
+    const validate = ajv.compile(userJsonSchema)
+    const valid = validate(user)
+    if (!valid) {
+        console.log(validate.errors);
+        return false
+    }
 
-    if(!login);
     return true
 }

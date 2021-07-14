@@ -6,7 +6,7 @@ require('dotenv').config();
 
 
 
-    async function registration({User : {login, password, color}}){
+    async function registration( {login, password}){
 
         if( !isPasswordValid(password) || !login) return null;
 
@@ -16,8 +16,7 @@ require('dotenv').config();
             const passwordHash = await hashSync(password,7);
             const {id} = await addUser({
                                         login: login,
-                                        passwordHash : passwordHash,
-                                        color: color
+                                        passwordHash : passwordHash
             })
 
             if(!id) return null;
@@ -38,7 +37,7 @@ require('dotenv').config();
 
             return sign({id: id, login: login}, process.env.SECRET);
 
-        }catch (e) { console.log(e.name)}
+        }catch (e) {console.log(e.name)}
     }
 
 
