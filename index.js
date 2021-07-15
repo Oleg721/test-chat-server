@@ -5,23 +5,28 @@ const WebSocket = require('ws');
 const onConnect = require(`./webSocket`);
 require('dotenv').config();
 const wsServer = new WebSocket.Server({ port: process.env.DEV_WS_PORT });
-const {isUserValid} = require('./validation')
-const {registration, login} = require('./controllers').authController
+//const {isUserValid} = require('./validation')
+//const {registration, login} = require('./controllers').authController;
+const  router = express.Router();
+const routes = require('./routes');
+
 
 app.use(express.static('public'));
 app.use(bodyParser.json());
 
 
-app.post('/sign-in', async (req, res) => {
-    if(!isUserValid(req.body)){
-        res.json({})
-    }
-    else {
-        const authToken = await login(req.body);
-        authToken ? res.json({token : authToken}) : res.json({token : await registration( req.body)});
-    }
-});
+// app.post('/sign-in', async (req, res) => {
+//     if(!isUserValid(req.body)){
+//         res.json({})
+//     }
+//     else {
+//         const authToken = await login(req.body);
+//         authToken ? res.json({token : authToken}) : res.json({token : await registration( req.body)});
+//     }
+// });
 
+
+app.use('/', routes);
 
 app.listen(port = process.env.DEW_PORT, () => {
     console.log(`Example app listening at http://localhost:${port}`)
