@@ -33,6 +33,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     color: {
       type : DataTypes.ENUM(`RED`, `ORANGE`, `YELLOW`, `GREEN`, `BLUE`, 'INDIGO', `VIOLET`),
+      set() {
+        const array = [`RED`, `ORANGE`, `YELLOW`, `GREEN`, `BLUE`, 'INDIGO', `VIOLET`];
+         const color = array[Math.floor(Math.random() * array.length)];
+        this.setDataValue('color', color);
+      }
     }
   }, {
     sequelize,

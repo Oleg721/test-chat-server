@@ -30,7 +30,7 @@ module.exports = {
         defaultValue: `USER`
       },
       color: {
-        type : Sequelize.ENUM(`RED`, `ORANGE`, `YELLOW`),
+        type : Sequelize.ENUM(`RED`, `ORANGE`, `YELLOW`, `GREEN`, `BLUE`, 'INDIGO', `VIOLET`),
       },
       createdAt: {
         allowNull: false,

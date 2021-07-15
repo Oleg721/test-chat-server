@@ -1,61 +1,52 @@
+const {verifyToken} = require('../utility');
 
 
-module.exports = function onConnect(wsClient) {
-    console.log('new connect');
-    wsClient.send('hello!');
-
-    wsClient.on('close', function() {
-        console.log('user disconnect');
-    });
+const clientsMap = new Map();
 
 
+module.exports = (wsServer)=>{
 
+    return function onConnect(wsClient) {
+        console.log('new connect');
+        wsClient.send('hello!');
 
+        wsClient.on('close', function() {
+            console.log('user disconnect');
+        });
 
-    wsClient.on('message', function(message) {
-        console.log(message);
-        try {
-            const jsonMessage = JSON.parse(message);
-            switch (jsonMessage.action) {
-                case 'ECHO':
+        wsClient.on('message', (message)=>wsReducer(message, wsClient));
 
-                    wsServer.clients.forEach(value => value.send(jsonMessage.data))
-                    //wsClient.send(jsonMessage.data);
+    }
 
-                    break;
-                // case 'PING':
-                //     setTimeout(function() {
-                //         wsClient.send('PONG');
-                //     }, 2000);
-                //     break;
-                default:
-                    console.log('Неизвестная команда');
-                    break;
-            }
-        } catch (error) {
-            console.log('Ошибка', error);
-        }
-    });
-
-    // wsClient.on('message', function(message) {
-    //     console.log(message);
-    //     try {
-    //         const jsonMessage = JSON.parse(message);
-    //         switch (jsonMessage.action) {
-    //             case 'ECHO':
-    //                 wsClient.send(jsonMessage.data);
-    //                 break;
-    //             case 'PING':
-    //                 setTimeout(function() {
-    //                     wsClient.send('PONG');
-    //                 }, 2000);
-    //                 break;
-    //             default:
-    //                 console.log('Неизвестная команда');
-    //                 break;
-    //         }
-    //     } catch (error) {
-    //         console.log('Ошибка', error);
-    //     }
-    // });
 }
+
+function wsReducer(message, wsClient) {
+
+    try {
+        const {action, authToken} = JSON.parse(message);
+
+        if(action === "CHECK_USER"){
+
+            if(!authToken) return;
+            if(!verifyToken(authToken)) return;
+            console.log(verifyToken(authToken));
+
+            const tokenPayload = authToken.match(/(?<=[.]).+(?=[.])/)[0];
+            const {id, login} = JSON.parse(Buffer
+                                    .from(tokenPayload, 'base64')
+                                    .toString(`binary`))
+
+            clientsMap.set(authToken, {payload: {id: id,
+                                                 login: login,
+                                                 wsClient: wsClient}});
+        }
+
+
+    } catch (error) {
+        console.log('Ошибка', error);
+    }
+
+    console.log(clientsMap);
+
+}
+

@@ -1,11 +1,11 @@
 const {hashSync, compareSync} = require(`bcrypt`);
-const {sign, verify} = require(`jsonwebtoken`);
+const {sign} = require(`jsonwebtoken`);
 const {isPasswordValid, isUserValid} = require(`../validation`);
 const {getUserByLogin, createUser} = require(`./userService`);
+
 require('dotenv').config();
 
 class AuthService {
-
 
     async registration( {login, password}){
 
@@ -43,14 +43,7 @@ class AuthService {
 
 
 
-    async verifyToken ({authToken}){
-        try {
-            return  !!verify(authToken, process.env.SECRET)
-        }catch (e) {
-            console.log(`verifyToken >> ` + e.name)
-        }
-        return false
-    }
+
 }
 
 module.exports = new AuthService()

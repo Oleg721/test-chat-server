@@ -2,29 +2,14 @@ const express = require('express');
 const bodyParser = require('body-parser')
 const app = express();
 const WebSocket = require('ws');
-const onConnect = require(`./webSocket`);
 require('dotenv').config();
 const wsServer = new WebSocket.Server({ port: process.env.DEV_WS_PORT });
-//const {isUserValid} = require('./validation')
-//const {registration, login} = require('./controllers').authController;
-const  router = express.Router();
+const onConnect = require(`./webSocket`)(wsServer);
 const routes = require('./routes');
 
 
 app.use(express.static('public'));
 app.use(bodyParser.json());
-
-
-// app.post('/sign-in', async (req, res) => {
-//     if(!isUserValid(req.body)){
-//         res.json({})
-//     }
-//     else {
-//         const authToken = await login(req.body);
-//         authToken ? res.json({token : authToken}) : res.json({token : await registration( req.body)});
-//     }
-// });
-
 
 app.use('/', routes);
 
@@ -33,4 +18,4 @@ app.listen(port = process.env.DEW_PORT, () => {
 })
 
 wsServer.on('connection', onConnect);
-console.log('Сервер запущен на 8080 порту');
+console.log(`WebSocket server run, listening at ${process.env.DEV_WS_PORT}`);
