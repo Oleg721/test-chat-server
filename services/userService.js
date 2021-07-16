@@ -1,11 +1,27 @@
+const {Op} = require("sequelize");
 const {User} = require(`../models`);
-const {verify} = require(`jsonwebtoken`);
-const fs = require('fs')
+// const {verify} = require(`jsonwebtoken`);
+// const fs = require('fs')
 
 class UsersService {
 
-    async getUsers(){
+    async getUserById(id){
+console.log(id)
+        return await User.findByPk(id);
+    }
+
+    async getAllUsers(){
         return await User.findAll();
+    }
+
+    async getAllActiveUsers(){
+        return await User.findAll({where: {
+                        [Op.not] : [{state: 3}]
+            }});
+    }
+
+    async getMessage(count){
+
     }
 
     async createUser({ login, passwordHash, role, color}) {
@@ -40,10 +56,3 @@ class UsersService {
 }
 
 module.exports = new UsersService()
-
-//module.exports  = {addUser, getUsers, getUserByLogin}
-
-
-
-
-////////////////////////////////////////

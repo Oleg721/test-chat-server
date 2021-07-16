@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       unique : true,
       validate: {
         min: 3,
-        is: /\w/
+        is: /^[a-zA-Z0-9 ]+$/
       }
     },
     passwordHash: {

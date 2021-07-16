@@ -7,7 +7,7 @@ require('dotenv').config();
 
 class AuthService {
 
-    async registration( {login, password}){
+    async registration( {login, password,role}){
 
         if( !isPasswordValid(password) || !login) return null;
 
@@ -17,7 +17,8 @@ class AuthService {
             const passwordHash = await hashSync(password,7);
             const {id} = await createUser({
                 login: login,
-                passwordHash : passwordHash
+                passwordHash : passwordHash,
+                role: role
             })
 
             if(!id) return null;
@@ -47,10 +48,3 @@ class AuthService {
 }
 
 module.exports = new AuthService()
-
-//module.exports  = {addUser, getUsers, getUserByLogin}
-
-
-
-
-////////////////////////////////////////

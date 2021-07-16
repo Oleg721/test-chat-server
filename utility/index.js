@@ -1,7 +1,7 @@
 require('dotenv').config();
 const {verify} = require(`jsonwebtoken`);
 
-module.exports.verifyToken = async (authToken)=>{
+module.exports.verifyToken = (authToken)=>{
     try {
         return  !!verify(authToken, process.env.SECRET)
     }catch (e) {

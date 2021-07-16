@@ -1,7 +1,8 @@
 const {verifyToken} = require('../utility');
+const {userService: {getAllUsers, getAllActiveUsers, getUserById},
+    messageService: {createMessage, getMessage}} = require(`../services`)
 
-
-const clientsMap = new Map();
+const connectUsersMap = new Map();
 
 
 module.exports = (wsServer)=>{
@@ -15,30 +16,58 @@ module.exports = (wsServer)=>{
         });
 
         wsClient.on('message', (message)=>wsReducer(message, wsClient));
-
     }
-
 }
 
-function wsReducer(message, wsClient) {
+
+
+async function wsReducer(message, wsClient) {
 
     try {
         const {action, authToken} = JSON.parse(message);
 
         if(action === "CHECK_USER"){
 
-            if(!authToken) return;
-            if(!verifyToken(authToken)) return;
-            console.log(verifyToken(authToken));
+            if(!authToken) return wsClient.close();
+            if(!verifyToken(authToken)) return wsClient.close();
 
             const tokenPayload = authToken.match(/(?<=[.]).+(?=[.])/)[0];
             const {id, login} = JSON.parse(Buffer
                                     .from(tokenPayload, 'base64')
-                                    .toString(`binary`))
+                                    .toString(`binary`));
 
-            clientsMap.set(authToken, {payload: {id: id,
-                                                 login: login,
-                                                 wsClient: wsClient}});
+            if(connectUsersMap.has(authToken)){
+                connectUsersMap.get(authToken).closeConnect();
+                console.log(`user is connected`)
+            }
+
+            const user = new UserItem(id, login, wsClient);
+            connectUsersMap.set(authToken, user);
+
+            //////////TMP ID!!!!!!!!!!!!!!!
+            const {role} = await getUserById(7);
+
+
+            let users;
+            role === "ADMIN" ? users = (await getAllUsers()) : users = (await getAllActiveUsers())
+
+               users = users
+                        .filter(({id: valId})=> {
+                            return valId !== id;
+                        })
+                        .map(({id, login, role, color}) => {
+                            return {id: id,
+                                    login: login,
+                                    role: role,
+                                    color: color}
+                        })
+
+                const messages = (await getMessage(20))
+                                        .map(({text,UserId})=>{
+                                                return {text: text, userId: UserId}
+                                        } );
+
+                user.send(users, messages)
         }
 
 
@@ -46,7 +75,24 @@ function wsReducer(message, wsClient) {
         console.log('Ошибка', error);
     }
 
-    console.log(clientsMap);
+    console.log(connectUsersMap.size);
 
 }
 
+class UserItem{
+    constructor(id, login, wsClient) {
+        this.id = id;
+        this.login = login;
+        this.wsClient = wsClient
+        this.sendMessageTime = 0;
+    }
+
+    closeConnect(){
+        this.wsClient.close();
+    }
+
+    send(users, messages){
+        this.wsClient.send(JSON.stringify({users: users, messages: messages}))
+    }
+
+}
