@@ -1,31 +1,29 @@
 const {Op} = require("sequelize");
 const {User} = require(`../models`);
-// const {verify} = require(`jsonwebtoken`);
-// const fs = require('fs')
+
 
 class UsersService {
 
-    async getUserById(id){
-console.log(id)
-        return await User.findByPk(id);
+
+    getUserById(id){
+        return User.findByPk(id);
     }
 
-    async getAllUsers(){
-        return await User.findAll();
+
+    getAllUsers(){
+        return User.findAll();
     }
 
-    async getAllActiveUsers(){
-        return await User.findAll({where: {
+
+    getAllActiveUsers(){
+        return User.findAll({where: {
                         [Op.not] : [{state: 3}]
             }});
     }
 
-    async getMessage(count){
 
-    }
-
-    async createUser({ login, passwordHash, role, color}) {
-        return await User.create({
+    createUser({ login, passwordHash, role, color}) {
+        return User.create({
             login: login,
             passwordHash : passwordHash,
             role: role,
@@ -33,19 +31,18 @@ console.log(id)
         })
     }
 
-    async getUsersCount(){
-        const c = await User.count();
-        return c;
+
+    getUsersCount(){
+        return User.count();
     }
 
-    async getUserByLogin(login){
-        console.log(login)
-        return await User.findOne({
+
+    getUserByLogin(login){
+        return User.findOne({
             where: {
                 login : login
             }});
     }
-
 
 
     async updateUser(data) {

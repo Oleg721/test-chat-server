@@ -1,37 +1,29 @@
 const {hashSync, compareSync} = require(`bcrypt`);
 const {sign} = require(`jsonwebtoken`);
-const {isPasswordValid, isUserValid} = require(`../validation`);
-const {getUserByLogin, createUser} = require(`./userService`);
-
+const {getUserByLogin, createUser, getUsersCount} = require(`./userService`);
 require('dotenv').config();
 
 class AuthService {
 
-    async registration( {login, password,role}){
-
-        if( !isPasswordValid(password) || !login) return null;
+    async registration( {login, password}){
 
         try {
-            if( await getUserByLogin(login)) return null;
-
-            const passwordHash = await hashSync(password,7);
             const {id} = await createUser({
-                login: login,
-                passwordHash : passwordHash,
-                role: role
-            })
-
-            if(!id) return null;
+                    login: login,
+                    passwordHash : await hashSync(password,7),
+                    role: await getUsersCount() ? `USER` : `ADMIN`
+                })
 
             return sign({id: id, login: login}, process.env.SECRET)
-        }catch (e) { console.log(e.name)}
 
+        }catch (e) {
+            console.log("registration " + e.name)
+        }
     }
 
 
 
     async login ({login, password}){
-        if( !isPasswordValid(password) || !login) return null;
 
         try {
             const {id, passwordHash} = await getUserByLogin(login);
@@ -39,11 +31,10 @@ class AuthService {
 
             return sign({id: id, login: login}, process.env.SECRET);
 
-        }catch (e) {console.log(e.name)}
+        }catch (e) {
+            console.log("login " + e.name)
+        }
     }
-
-
-
 
 }
 

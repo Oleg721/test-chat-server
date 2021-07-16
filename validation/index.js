@@ -4,7 +4,9 @@ const userJsonSchema = require('../jsonShemas')
 
 
 module.exports.isPasswordValid = (password)=>{
-    if(!password || password.length < 8) return false;
+    if(!password || password.length < 8) {
+        return false;
+    }
     return true
 }
 

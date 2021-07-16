@@ -1,28 +1,33 @@
-const {userService: {getUsersCount} ,
-        authService: {registration}} = require('../services')
+const {userService: {getUsersCount, getUserByLogin} ,
+        authService: {registration, login : loginUser }} = require('../services')
+const {isUserValid} = require('../validation');
+const {sign} = require(`jsonwebtoken`);
 
 
 class UsersController {
 
-    getUsers(req, res) {
-        return res
-            .status(200)
-            .json({mess: `its work in userController`})
-    }
-
     async createUser(req, res) {
 
-        const {login, password} = req.body;
-        const role = await getUsersCount() ? `USER` : `ADMIN`;
-        const authToken = await registration({
-                                        login : login,
-                                        password: password,
-                                        role: role});
+        if(!isUserValid(req.body)){
+            return res
+                .status(400)
+                .json({ message: 'not valid user' })
+        }
+
+        //////уточнить как лучше избежать ошибок
+        const user = await getUserByLogin(req.body.login) ? await loginUser(req.body) : await registration(req.body);
+
+        if(!user){
+            return res
+                .status(400)
+                .json({ message: 'not valid user' })
+        }
+        //////
         return res
             .status(200)
-            .json({authToken : authToken});
-    }
+            .json({authToken : sign({id: user.id, login: user.login}, process.env.SECRET)});
 
+    }
 }
 
 module.exports = new UsersController();
