@@ -8,13 +8,14 @@ class AuthService {
     async registration( {login, password}){
 
         try {
-            const {id} = await createUser({
+            return await createUser({
                     login: login,
                     passwordHash : await hashSync(password,7),
                     role: await getUsersCount() ? `USER` : `ADMIN`
                 })
 
-            return sign({id: id, login: login}, process.env.SECRET)
+
+            //return sign({id: id, login: login}, process.env.SECRET)
 
         }catch (e) {
             console.log("registration " + e.name)
@@ -26,10 +27,12 @@ class AuthService {
     async login ({login, password}){
 
         try {
-            const {id, passwordHash} = await getUserByLogin(login);
-            if(!await compareSync(password,passwordHash)) return null;
+           // const {id, passwordHash} = await getUserByLogin(login);
+            const user = await getUserByLogin(login);
+            if(!await compareSync(password,user.passwordHash)) return null;
 
-            return sign({id: id, login: login}, process.env.SECRET);
+            return user;
+            //return sign({id: id, login: login}, process.env.SECRET);
 
         }catch (e) {
             console.log("login " + e.name)
