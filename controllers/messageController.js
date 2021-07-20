@@ -1,4 +1,5 @@
-const {Message} = require(`../models`);
+const {Message, User} = require(`../models`);
+
 
 
 async function addMessage({ login, passwordHash, color}){

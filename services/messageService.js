@@ -10,11 +10,14 @@ class MessagesService {
         await message.setUser(user);
     }
 
-    async getMessage(limit){
-        return await Message.findAll({limit: limit})
+    async getMessages(limit){
+        return await Message.findAll({
+            limit: limit,
+            include: User
+        })
     }
 
 }
 
-module.exports = new MessagesService()
+module.exports = new MessagesService();
 

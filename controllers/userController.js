@@ -23,9 +23,13 @@ class UsersController {
                 .json({ message: 'not valid user' })
         }
         //////
+        const payload = {id: user.id,
+                         login: user.login,
+                         role: user.role,
+                         color: user.color}
         return res
             .status(200)
-            .json({authToken : sign({id: user.id, login: user.login}, process.env.SECRET)});
+            .json({authToken : sign(payload, process.env.SECRET)});
 
     }
 }
