@@ -6,29 +6,45 @@ class UsersService {
 
 
     getUserById(id){
-        return User.findByPk(id);
+        try {
+            return User.findByPk(id);
+        } catch (err){
+            console.log(err)
+        }
     }
 
 
     getAllUsers(){
-        return User.findAll();
+        try {
+            return User.findAll();
+        } catch (err){
+            console.log(err)
+        }
     }
 
 
     getAllActiveUsers(){
-        return User.findAll({where: {
-                        [Op.not] : [{state: 3}]
-            }});
+        try {
+            return User.findAll({where: {
+                    [Op.not] : [{state: 3}]
+                }});
+        } catch (err){
+            console.log(err)
+        }
     }
 
 
     createUser({ login, passwordHash, role, color}) {
-        return User.create({
-            login: login,
-            passwordHash : passwordHash,
-            role: role,
-            color: color
-        })
+        try {
+            return User.create({
+                login: login,
+                passwordHash : passwordHash,
+                role: role,
+                color: color
+            })
+        } catch (err){
+            console.log(err)
+        }
     }
 
 
@@ -38,18 +54,36 @@ class UsersService {
 
 
     getUserByLogin(login){
-        return User.findOne({
-            where: {
-                login : login
-            }});
+        try {
+            return User.findOne({
+                where: {
+                    login : login
+                }});
+        } catch (err){
+            console.log(err)
+        }
     }
 
 
-    async updateUser(data) {
+    updateUserState(id, state) {
+        try {
+            return User.update({state: state}, {
+                where: {
+                    [Op.and]: [
+                        {id: id},
+                        {[Op.not]: {
+                            role: `ADMIN`
+                            }}
+                    ]
+                }
+
+            })
+
+        }catch (err){
+            console.log(err);
+        }
     }
 
-    async deleteUser(data) {
-    }
 }
 
 module.exports = new UsersService()

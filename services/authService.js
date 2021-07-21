@@ -14,9 +14,6 @@ class AuthService {
                     role: await getUsersCount() ? `USER` : `ADMIN`
                 })
 
-
-            //return sign({id: id, login: login}, process.env.SECRET)
-
         }catch (e) {
             console.log("registration " + e.name)
         }
@@ -27,12 +24,11 @@ class AuthService {
     async login ({login, password}){
 
         try {
-           // const {id, passwordHash} = await getUserByLogin(login);
             const user = await getUserByLogin(login);
             if(!await compareSync(password,user.passwordHash)) return null;
 
             return user;
-            //return sign({id: id, login: login}, process.env.SECRET);
+
 
         }catch (e) {
             console.log("login " + e.name)

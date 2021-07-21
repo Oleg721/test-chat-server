@@ -2,86 +2,91 @@
      messageService: {createMessage, getMessages}} = require(`../services`);
 const {decode, verify} = require(`jsonwebtoken`);
 const registerUserHandlers = require(`../handlers/userHandlers`)
+ const registerMessageHandlers = require('../handlers/messageHandlers')
 require('dotenv').config();
 
 
-// const usersMap = new Map();
  const onlineUsers = {};
-const messagesArr = {};
 
 
 module.exports = (io)=>{
 
-    return (socket)=> {
+    return async (socket)=> {
 
         try {
 
-            const {id,userData} = verify(socket.handshake.auth.token, process.env.SECRET);
+            const {id: userId} = verify(socket.handshake.auth.token, process.env.SECRET);
 
             // user already connected?
-            if(onlineUsers[id]) {
+            if(onlineUsers[userId]) {
                 const userSocket = io
-                                    .sockets
-                                    .sockets[onlineUsers[id].socketId]
+                    .sockets
+                    .sockets
+                    .get(onlineUsers[userId].socketId)
                 userSocket && userSocket.disconnect(true);
             }
 
+            // get user in db
+            const { login,
+                    state,
+                    role,
+                    color} = await getUserById(userId);
 
-            getUserById(id)
-                .then(({id, login, state, role, color}) =>{
-                    if(state === `BANNED`){
-                        socket.disconnect()
-                    }
+            if(state === `BANNED`){
+                socket.disconnect();
+                return
+            }
 
-                    const user = {
-                        login: login,
-                        state: state,
-                        role: role,
-                        color: color,
-                        socketId : socket.id,
-                        sendMessageTime: null}
+            const user = {
+                login: login,
+                state: state,
+                role: role,
+                color: color,
+                socketId : socket.id,
+                sendMessageTime: null}
 
-                    //add online user to arr
-                    onlineUsers[id] = user;
+            //add online user to arr
+            onlineUsers[userId] = user;
 
-                    //send event add user
-                    socket.broadcast.emit("user:add", {id: id, ...user});
+            //bind userId to socket
+            socket[`UserId_${socket.id}`] = userId
 
-                        //send users
-                        if(role === `USER`){
-                            socket.emit(`users`, onlineUsers)
-                        }else {
-                            getAllUsers()
-                                .then(value => {
-                                    const users = {}
-                                    value.forEach(({dataValues}) => {
-                                        users[dataValues.id] = {
-                                            login: dataValues.login,
-                                            state: dataValues.state,
-                                            role: dataValues.role,
-                                            color: dataValues.color
-                                        }
-                                    })
-                                    socket.emit(`users`, users)
-                            })
-                        }
+            //send event add user
+            socket.broadcast.emit("user:add", {id: userId, ...user});
 
-                        //send messages
-                        getMessages(20)
-                            .then(value => {
-                                socket.emit(`messages`, Array.from(value.map(message => {
-                                    return {
-                                        ...message.dataValues,
-                                        authorLogin: message.User.login,
-                                        authorColor: message.User.color}
-                                })));
-                            })
 
-            }).catch(reason => {
-                console.log(reason)
-                socket.disconnect(true)
-            })
+            // //send users to front
+            if(role === `USER`){
+                socket.emit(`users`, onlineUsers)
+            }else {
+                getAllUsers()
+                    .then(value => {
+                        const users = {}
+                        value.forEach(({dataValues}) => {
+                            users[dataValues.id] = {
+                                login: dataValues.login,
+                                state: dataValues.state,
+                                role: dataValues.role,
+                                color: dataValues.color
+                            }
+                        })
+                        socket.emit(`users`, users)
+                })
+            }
 
+                //send messages to front
+                getMessages(20)
+                    .then(value => {
+                        socket.emit(`messages`, Array.from(value.map(message => {
+                            const { User: {login, color},
+                                    updatedAt,
+                                    ...messageData} = message.dataValues;
+                            return {
+                                ...messageData,
+                                authorLogin: login,
+                                authorColor: color}
+                        })));
+                    })
 
         }catch (err){
             console.log(err);
@@ -89,18 +94,16 @@ module.exports = (io)=>{
             return
         }
 
-        registerUserHandlers(io, socket)
+        registerUserHandlers(io, socket, onlineUsers);
+        registerMessageHandlers(io, socket, onlineUsers);
 
         socket.on('disconnect', () => {
             console.log('User disconnected');
             //delete user from onlineUsersArr
-            for(let id in onlineUsers){
-                if(onlineUsers[id].socketId === socket.id){
-                    delete onlineUsers[id];
-                    io.emit(`user:leave`, id);
-                    return
-                }
-            }
+            const disconnectedUserId =  socket[`UserId_${socket.id}`]
+            delete onlineUsers[disconnectedUserId];
+            io.emit(`user:leave`, disconnectedUserId);
+
         })
     }
 }

@@ -4,17 +4,25 @@ const {User, Message} = require(`../models`);
 
 class MessagesService {
 
-    async createMessage(id){
-        const user = await User.findByPk(id);
-        const message = await Message.create({text: 'its new message22442'})
-        await message.setUser(user);
+    async createMessage(messageText , AuthorId){
+        try {
+            const user = await User.findByPk(AuthorId);
+            const message = await Message.create({text: messageText})
+            return await message.setUser(user);
+        } catch (err){
+            console.log(err)
+        }
     }
 
     async getMessages(limit){
-        return await Message.findAll({
-            limit: limit,
-            include: User
-        })
+        try {
+            return Message.findAll({
+                limit: limit,
+                include: User
+            })
+        }catch (err){
+            console.log(err)
+        }
     }
 
 }

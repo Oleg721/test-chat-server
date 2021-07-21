@@ -22,7 +22,7 @@ module.exports = {
         allowNull : false,
       },
       state: {
-        type : Sequelize.ENUM(`ACTIVE`, `MUTED`, `BANED`),
+        type : Sequelize.ENUM(`ACTIVE`, `MUTED`, `BANNED`),
         defaultValue : `ACTIVE`
       },
       role:{
