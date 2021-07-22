@@ -11,13 +11,14 @@ module.exports = (io)=>{
     return async (socket)=> {
         try {
             const {id: userId} = verify(socket.handshake.auth.token, process.env.SECRET);
+
             // user already connected?
             if(onlineUsers[userId]) {
                 io
                     .sockets
                     .sockets
                     .get(onlineUsers[userId].socketId)
-                    .disconnect(true);
+                    ?.disconnect(true);
             }
             // get user in db
             const { login, state, role, color} = await getUserById(userId);
@@ -31,6 +32,8 @@ module.exports = (io)=>{
 
             //bind userId to socket
             socket[`UserId_${socket.id}`] = userId
+
+            socket.emit('connectIsSuccess');
 
             //send event add user
             socket.broadcast.emit('user:add', {id: userId, ...user});
@@ -70,7 +73,6 @@ module.exports = (io)=>{
             const disconnectedUserId =  socket[`UserId_${socket.id}`]
             delete onlineUsers[disconnectedUserId];
             io.emit('user:leave', disconnectedUserId);
-
         })
     }
 }
