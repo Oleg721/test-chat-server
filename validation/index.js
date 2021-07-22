@@ -1,7 +1,5 @@
-const Ajv = require("ajv");
+const Ajv = require('ajv');
 const userJsonSchema = require('../jsonShemas')
-
-
 
 module.exports.isPasswordValid = (password)=>{
     if(!password || password.length < 8) {
@@ -9,7 +7,6 @@ module.exports.isPasswordValid = (password)=>{
     }
     return true
 }
-
 
 module.exports.isUserValid = (user)=>{
     const ajv = new Ajv()
@@ -19,6 +16,5 @@ module.exports.isUserValid = (user)=>{
         console.log(validate.errors);
         return false
     }
-
     return true
 }

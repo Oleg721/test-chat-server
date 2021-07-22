@@ -22,25 +22,20 @@ module.exports = {
         allowNull : false,
       },
       state: {
-        type : Sequelize.ENUM(`ACTIVE`, `MUTED`, `BANNED`),
+        type : Sequelize.ENUM('ACTIVE', 'MUTED', 'BANNED'),
         defaultValue : `ACTIVE`
       },
       role:{
-        type: Sequelize.ENUM(`ADMIN`, `USER`),
-        defaultValue: `USER`
+        type: Sequelize.ENUM('ADMIN', 'USER'),
+        defaultValue: 'USER'
       },
       color: {
-        type : Sequelize.ENUM(`RED`, `ORANGE`, `YELLOW`, `GREEN`, `BLUE`, 'INDIGO', `VIOLET`),
+        type : Sequelize.ENUM('RED', 'ORANGE', 'YELLOW', 'GREEN', 'BLUE', 'INDIGO', 'VIOLET'),
       },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
       }
-      // ,
-      // updatedAt: {
-      //   allowNull: false,
-      //   type: Sequelize.DATE
-      // }
     });
   },
   down: async (queryInterface, Sequelize) => {

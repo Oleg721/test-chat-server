@@ -24,17 +24,17 @@ module.exports = (sequelize, DataTypes) => {
       allowNull : false,
     },
     state: {
-      type : DataTypes.ENUM(`ACTIVE`, `MUTED`, `BANNED`),
-      defaultValue : `ACTIVE`
+      type : DataTypes.ENUM('ACTIVE', 'MUTED', 'BANNED'),
+      defaultValue : 'ACTIVE'
     },
     role:{
-      type: DataTypes.ENUM(`ADMIN`, `USER`),
-      defaultValue: `USER`
+      type: DataTypes.ENUM('ACTIVE', 'USER'),
+      defaultValue: 'USER'
     },
     color: {
-      type : DataTypes.ENUM(`RED`, `ORANGE`, `YELLOW`, `GREEN`, `BLUE`, 'INDIGO', `VIOLET`),
+      type : DataTypes.ENUM('RED', 'ORANGE', 'YELLOW', 'GREEN', 'BLUE', 'INDIGO', 'VIOLET'),
       set() {
-        const array = [`RED`, `ORANGE`, `YELLOW`, `GREEN`, `BLUE`, 'INDIGO', `VIOLET`];
+        const array = ['RED', 'ORANGE', 'YELLOW', 'GREEN', 'BLUE', 'INDIGO', 'VIOLET'];
          const color = array[Math.floor(Math.random() * array.length)];
         this.setDataValue('color', color);
       }

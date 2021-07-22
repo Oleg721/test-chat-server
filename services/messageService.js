@@ -1,6 +1,5 @@
-const {Op} = require("sequelize");
-const {User, Message} = require(`../models`);
-
+const {Op} = require('sequelize');
+const {User, Message} = require('../models');
 
 class MessagesService {
 
@@ -17,14 +16,15 @@ class MessagesService {
     async getMessages(limit){
         try {
             return Message.findAll({
+                raw: true,
                 limit: limit,
+                order: [['createdAt', 'DESC']],
                 include: User
             })
         }catch (err){
             console.log(err)
         }
     }
-
 }
 
 module.exports = new MessagesService();

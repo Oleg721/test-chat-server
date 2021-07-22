@@ -1,9 +1,7 @@
-const {Op} = require("sequelize");
-const {User} = require(`../models`);
-
+const {Op} = require('sequelize');
+const {User} = require('../models');
 
 class UsersService {
-
 
     getUserById(id){
         try {
@@ -13,7 +11,6 @@ class UsersService {
         }
     }
 
-
     getAllUsers(){
         try {
             return User.findAll();
@@ -21,7 +18,6 @@ class UsersService {
             console.log(err)
         }
     }
-
 
     getAllActiveUsers(){
         try {
@@ -32,7 +28,6 @@ class UsersService {
             console.log(err)
         }
     }
-
 
     createUser({ login, passwordHash, role, color}) {
         try {
@@ -47,11 +42,9 @@ class UsersService {
         }
     }
 
-
     getUsersCount(){
         return User.count();
     }
-
 
     getUserByLogin(login){
         try {
@@ -64,7 +57,6 @@ class UsersService {
         }
     }
 
-
     updateUserState(id, state) {
         try {
             return User.update({state: state}, {
@@ -72,18 +64,15 @@ class UsersService {
                     [Op.and]: [
                         {id: id},
                         {[Op.not]: {
-                            role: `ADMIN`
+                            role: 'ADMIN'
                             }}
                     ]
                 }
-
             })
-
         }catch (err){
             console.log(err);
         }
     }
-
 }
 
 module.exports = new UsersService()
