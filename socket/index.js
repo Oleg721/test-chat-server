@@ -1,4 +1,4 @@
- const {userService: {getAllUsers, getUserById},
+const {userService: {getAllUsers, getUserById},
      messageService: {getMessages}} = require('../services');
 const {verify} = require('jsonwebtoken');
 const registerUserHandlers = require('../handlers/userHandlers')

@@ -14,7 +14,7 @@ module.exports = (io, socket, onlineUsers) => {
         try {
             const {updatedAt, ...messageData} =
                 (await messageService.createMessage(message, userId))
-
+                    .dataValues
             user.sendMessageTime = Date.now();
             io.sockets.emit('message:add', {
                 ...messageData,
